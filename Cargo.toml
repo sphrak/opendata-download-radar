@@ -9,5 +9,6 @@ name = "opendata-download-radar"
 path = "src/main.rs"
 
 [dependencies]
+image = "*"
 rocket = "0.4.0"
 reqwest = "0.9.6"
