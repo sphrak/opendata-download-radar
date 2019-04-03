@@ -3,6 +3,10 @@ Drop-in API replacement if you want to use SMHI radar imagery
 but serve the `.tiff` format as `.png`'s instead since its
 not officially supported.
 
+### Libraries used
+* https://docs.rs/image/0.21.0/image/
+* https://github.com/seanmonstar/reqwest
+* https://github.com/SergioBenitez/Rocket
 
 Supports latest radar images served as `.png`.
 
@@ -19,10 +23,10 @@ png format and serve you it back.
 You still send the SMHI request like: 
 
 ```
-GET /api/version/latest/area/sweden/product/comp/2019/04/03/radar_0810010000.tif
+GET /api/version/latest/area/sweden/product/comp/2019/04/03/radar_1904030005.tif
 ```
 
-or http://localhost:8000/api/version/latest/area/sweden/product/comp/2019/04/03/radar_0810010000.tif
+or http://localhost:8000/api/version/latest/area/sweden/product/comp/2019/04/03/radar_1904030005.tif
 
 You only change your `BASE_URL` in whatever application you use.
 
