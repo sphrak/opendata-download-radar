@@ -22,6 +22,9 @@ You still send the SMHI request like:
 GET /api/version/latest/area/sweden/product/comp/2008/10/01/radar_0810010000.tif
 ```
 
+
+
+
 You only change your `BASE_URL` in whatever application you use.
 
 But you will get back a radar image in .png format instead to overcome this.
@@ -31,6 +34,17 @@ The radar images are stored in `/latest/area/sweden/product/comp/{year}/{month}/
 
 The API caches the radar image in memory for a certain time, otherwise it fetches it
 from disk.
+
+# Run
+```sh
+cargo run
+```
+
+# Test
+```sh
+GET http://localhost:8000/api/version/latest/area/sweden/product/comp/2019/04/03
+Current path: /version/latest/area/sweden/product/comp/2019/04/03
+```
 
 # Models
 

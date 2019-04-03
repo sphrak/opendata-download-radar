@@ -2,11 +2,11 @@
 
 #[macro_use] extern crate rocket;
 
-#[get("/")]
-fn index() -> &'static str {
-    "Hello, welt!"
+#[get("/version/latest/area/sweden/product/comp/<year>/<month>/<day>")]
+fn api(year: String, month: String, day: String) -> String {
+    format!("Current path: /version/latest/area/sweden/product/comp/{}/{}/{}", year, month, day)
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![index]).launch();
+    rocket::ignite().mount("/api", routes![api]).launch();
 }
