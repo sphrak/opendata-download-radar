@@ -22,8 +22,7 @@ You still send the SMHI request like:
 GET /api/version/latest/area/sweden/product/comp/2008/10/01/radar_0810010000.tif
 ```
 
-
-
+or http://localhost:8000/api/version/latest/area/sweden/product/comp/2008/10/01/radar_0810010000.tif
 
 You only change your `BASE_URL` in whatever application you use.
 
