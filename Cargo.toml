@@ -1,0 +1,12 @@
+[package]
+name = "opendata-download-radar"
+version = "0.1.0"
+authors = ["Niclas Kron <niclas.kroon@protonmail.ch>"]
+edition = "2018"
+
+[[bin]]
+name = "opendata-download-radar"
+path = "src/main.rs"
+
+[dependencies]
+rocket = "0.4.0"

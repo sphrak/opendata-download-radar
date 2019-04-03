@@ -4,7 +4,6 @@ but serve the `.tiff` format as `.png`'s instead since its
 not officially supported.
 
 
-
 Supports latest radar images served as `.png`.
 
 What is this?
