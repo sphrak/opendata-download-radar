@@ -19,10 +19,10 @@ png format and serve you it back.
 You still send the SMHI request like: 
 
 ```
-GET /api/version/latest/area/sweden/product/comp/2008/10/01/radar_0810010000.tif
+GET /api/version/latest/area/sweden/product/comp/2019/04/03/radar_0810010000.tif
 ```
 
-or http://localhost:8000/api/version/latest/area/sweden/product/comp/2008/10/01/radar_0810010000.tif
+or http://localhost:8000/api/version/latest/area/sweden/product/comp/2019/04/03/radar_0810010000.tif
 
 You only change your `BASE_URL` in whatever application you use.
 
@@ -48,7 +48,7 @@ Current path: /version/latest/area/sweden/product/comp/2019/04/03
 # Models
 
 ```sh
-GET https://opendata-download-radar.smhi.se/api/version/latest/area/sweden/product/comp/2008/10/01/radar_0810010000.png
+GET https://opendata-download-radar.smhi.se/api/version/latest/area/sweden/product/comp/2019/04/03/radar_0810010000.png
 GET https://opendata-download-radar.example.tld/api/version/latest/area/sweden/product/comp/{year}/{month}/{date}/{radar}_{date}.png
 ```
 
