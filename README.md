@@ -7,6 +7,7 @@ not officially supported.
 * https://docs.rs/image/0.21.0/image/
 * https://github.com/seanmonstar/reqwest
 * https://github.com/SergioBenitez/Rocket
+* Optional https://github.com/Ogeon/palette
 
 Supports latest radar images served as `.png`.
 
@@ -33,7 +34,7 @@ You only change your `BASE_URL` in whatever application you use.
 But you will get back a radar image in .png format instead to overcome this.
 OPtionall you can let the `opendata-download-radar`-api apply colors to it aswell.
 
-The radar images are stored in `/latest/area/sweden/product/comp/{year}/{month}/{date}/`.
+The radar images are stored in `/data/{year}/{month}/{date}/`.
 
 The API caches the radar image in memory for a certain time, otherwise it fetches it
 from disk.
