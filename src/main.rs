@@ -1,22 +1,22 @@
 #![feature(proc_macro_hygiene, decl_macro)]
-
 use std::fs::File;
 use std::fs::create_dir_all;
-use std::io::copy;
+use std::io::Read;
 use std::path::Path;
-use std::path::PathBuf;
 
-//  Get a url
-//  Check if its in cache, on disk if it is we serve that
-//  otherwise we fetch from SMHI
-//  colorize it via libtiff and convert to png
-//  return a png file
-
+#[macro_use] extern crate image;
+use image::RGB;
+use image::load_from_memory_with_format;
+use image::save_buffer;
+use image::DynamicImage;
+use image::GenericImageView;
 
 #[macro_use] extern crate rocket;
 use rocket::{get, routes};
 use rocket::response::content;
 use rocket::http::ContentType;
+
+use reqwest::Response;
 
 const API_URL: &str = "https://opendata-download-radar.smhi.se/api";
 const SUB_DIRECTORY: &str = "version/latest/area/sweden/product/comp";
@@ -31,37 +31,46 @@ fn retrieve(year: String, month: String, day: String, filename: String) -> Optio
 
     let file: String = format!("{year}/{month}/{day}/{filename}", year = year, month = month, day = day, filename = filename);
     let path: String = format!("{year}/{month}/{day}", year = year, month = month, day = day);
-    println!("{}", file);
-
     let url: String = format!("{}/{}/{}", API_URL, SUB_DIRECTORY, file);
-    println!("GET {}", url);
 
     /**
      *  Create directory if we know it does not exist.
      */
     mkdir(&path);
 
-    let mut resp = reqwest::get(&url).expect("Request failed.");
-    let mut file: File = File::create(&file).expect("Failed writing file");
+    let full_path: &Path = Path::new(&file);
+    let mut response: Response = reqwest::get(&url).unwrap();
+    let filename_path: &Path = Path::new(&filename);
 
-    copy(&mut resp, &mut file);
 
-    //let _img = image::open(&file).unwrap();
+    match filename_path.file_stem() {
+        Some(stem) => {
 
-    let filename_path = Path::new(&filename);
-    if let Some(stem) = filename_path.file_stem() {
-        let newfile = format!("{}/{}.png", path, stem.to_str().unwrap());
-        println!("NEW FILE: {}", stem.to_str().unwrap());
+            let new_file: String = format!("{}/{}.png", path, stem.to_str().unwrap());
+            let new_path: &Path = Path::new(&new_file);
 
-        assert_eq!(stem.to_str().unwrap(), "radar_1904030005");
-    } else {
-        println!("Error man");
+            let mut buffer: Vec<u8> = Vec::new();
+
+            response.read_to_end(&mut buffer).unwrap();
+
+            let img: DynamicImage = load_from_memory_with_format(&buffer, image::ImageFormat::TIFF).unwrap();
+
+            // get dimensions
+            let (width, height) = img.dimensions();
+
+            // save the buffer as .png file
+            println!("Saving: {:?}", new_path);
+            img.save(new_path).unwrap();
+
+        }
+        None => {
+            panic!("Error");
+        }
     }
 
+    let new_path = Path::new("2019/04/03/radar_1904030005.png");
 
-    //_img.save(file).unwrap();
-    // we return MODIFIED png here
-    File::open(&path).map(|f| content::Content(ContentType::PNG, f)).ok()
+    File::open(&new_path).map(|f| content::Content(ContentType::PNG, f)).ok()
 }
 
 #[catch(404)]
@@ -75,5 +84,5 @@ fn main() {
         .register(catchers![not_found])
         .launch();
 
-    println!("Wops: {}", r)
+    println!("Woops: {}", r)
 }
