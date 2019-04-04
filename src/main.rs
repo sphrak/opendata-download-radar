@@ -3,6 +3,7 @@ use std::fs::File;
 use std::fs::create_dir_all;
 use std::io::Read;
 use std::path::Path;
+use std::time::{Duration, Instant};
 
 #[macro_use] extern crate image;
 use image::RGB;
@@ -29,6 +30,9 @@ fn mkdir(path: &str) -> std::io::Result<()> {
 #[get("/version/latest/area/sweden/product/comp/<year>/<month>/<day>/<filename>")]
 fn retrieve(year: String, month: String, day: String, filename: String) -> Option<content::Content<File>> {
 
+    let start = Instant::now();
+    println!("Start Elapsed: {:?}", start.elapsed());
+
     let file: String = format!("{year}/{month}/{day}/{filename}", year = year, month = month, day = day, filename = filename);
     let path: String = format!("{year}/{month}/{day}", year = year, month = month, day = day);
     let url: String = format!("{}/{}/{}", API_URL, SUB_DIRECTORY, file);
@@ -36,12 +40,15 @@ fn retrieve(year: String, month: String, day: String, filename: String) -> Optio
     /**
      *  Create directory if we know it does not exist.
      */
+    println!("Elapsed: {:?}", start.elapsed());
     mkdir(&path);
+    println!("Created directory: {:?}", start.elapsed());
 
     let full_path: &Path = Path::new(&file);
-    let mut response: Response = reqwest::get(&url).unwrap();
-    let filename_path: &Path = Path::new(&filename);
 
+    let mut response: Response = reqwest::get(&url).unwrap();
+    println!("After network request: {:?}", start.elapsed());
+    let filename_path: &Path = Path::new(&filename);
 
     match filename_path.file_stem() {
         Some(stem) => {
@@ -62,6 +69,13 @@ fn retrieve(year: String, month: String, day: String, filename: String) -> Optio
             println!("Saving: {:?}", new_path);
             img.save(new_path).unwrap();
 
+            println!("Height: {}", height);
+            println!("Weight: {}", width);
+            for x in 0..width {
+                for y in 0..height {
+
+                }
+            }
         }
         None => {
             panic!("Error");
@@ -70,7 +84,11 @@ fn retrieve(year: String, month: String, day: String, filename: String) -> Optio
 
     let new_path = Path::new("2019/04/03/radar_1904030005.png");
 
-    File::open(&new_path).map(|f| content::Content(ContentType::PNG, f)).ok()
+    println!("Elapsed: {:?}", start.elapsed());
+    let f =  File::open(&new_path).map(|f| content::Content(ContentType::PNG, f)).ok();
+    let duration = start.elapsed();
+    println!("END Elapsed: {:?}", start.elapsed());
+    f
 }
 
 #[catch(404)]

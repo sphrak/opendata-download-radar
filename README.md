@@ -3,6 +3,9 @@ Drop-in API replacement if you want to use SMHI radar imagery
 but serve the `.tiff` format as `.png`'s instead since its
 not officially supported.
 
+Downloads and colorizes and serves a 887x471 pixel image in < 100 ms.
+
+
 ### Libraries used
 * https://docs.rs/image/0.21.0/image/
 * https://github.com/seanmonstar/reqwest
