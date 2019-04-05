@@ -8,7 +8,7 @@ extern crate rocket;
 use std::fs::create_dir_all;
 use std::fs::File;
 use std::io::Read;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use rand::Rng;
@@ -27,6 +27,7 @@ use rocket::response::content;
 
 const API_URL: &str = "https://opendata-download-radar.smhi.se/api";
 const SUB_DIRECTORY: &str = "version/latest/area/sweden/product/comp";
+const TIFF_EXTENSION: &str = "tif";
 
 fn mkdir(path: &str) -> std::io::Result<()> {
     create_dir_all(&path)?;
@@ -43,8 +44,6 @@ fn get_rand_col(alpha: u8) -> Rgba<u8> {
 }
 
 fn gain(rgb: [u8; 3], alpha: u8) -> Rgba<u8> {
-    /*let pixel_rgb: [u8; 3] = [192,255,255];*/
-
     match rgb {
         [0, 0, 0] => Rgba([0,0,0, 255/4]),
         [54, 54, 54] => get_rand_col(alpha),
@@ -152,42 +151,6 @@ fn gain(rgb: [u8; 3], alpha: u8) -> Rgba<u8> {
     }
 }
 
-fn image(filename: String, path: String, url: String) -> &'static Path {
-
-    let mut response: Response = reqwest::get(&url).unwrap();
-    let filename_path: &Path = Path::new(&filename);
-
-    match filename_path.file_stem() {
-        Some(stem) => {
-            let new_file: String = format!("{}/{}.png", &path, stem.to_str().unwrap());
-            let new_path: &Path = Path::new(&new_file);
-
-            let mut buffer: Vec<u8> = Vec::new();
-
-            response.read_to_end(&mut buffer).unwrap();
-
-            let img: DynamicImage = load_from_memory_with_format(&buffer, image::ImageFormat::TIFF).unwrap();
-            let (width, height) = img.dimensions();
-
-            let mut new_colorized_image = ImageBuffer::new(width, height);
-
-            for (x, y, pixel) in img.pixels() {
-                let [r, g, b, alpha] = pixel.data;
-                let new_pixel: Rgba<u8> = gain([r,g,b], alpha);
-                new_colorized_image.put_pixel(x, y, new_pixel)
-            }
-
-            new_colorized_image.save(new_path).unwrap();
-
-
-            new_path
-        }
-        None => {
-            panic!("Error");
-        }
-    }
-}
-
 #[get("/version/latest/area/sweden/product/comp/<year>/<month>/<day>/<filename>")]
 fn retrieve(year: String, month: String, day: String, filename: String) -> Option<content::Content<File>> {
     let start = Instant::now();
@@ -195,21 +158,17 @@ fn retrieve(year: String, month: String, day: String, filename: String) -> Optio
 
     let file: String = format!("{year}/{month}/{day}/{filename}", year = year, month = month, day = day, filename = filename);
     let path: String = format!("{year}/{month}/{day}", year = year, month = month, day = day);
-    let url: String = format!("{}/{}/{}", API_URL, SUB_DIRECTORY, file);
+    let url: String = format!("{}/{}/{}.{}", API_URL, SUB_DIRECTORY, file, TIFF_EXTENSION);
+    println!("INTERNAL GET: {}", url);
 
-    /**
-     *  Create directory if we know it does not exist.
-     */
-    println!("Elapsed: {:?}", start.elapsed());
     mkdir(&path);
-    println!("Created directory: {:?}", start.elapsed());
 
-    let full_path: &Path = Path::new(&file);
+    let mut response: Response = reqwest::get(&url).unwrap();
+    let filename_path: &Path = Path::new(&filename);
 
-
-
-    /*let new: &Path = match filename_path.file_stem() {
+    let path_buf: PathBuf = match filename_path.file_stem() {
         Some(stem) => {
+
             let new_file: String = format!("{}/{}.png", &path, stem.to_str().unwrap());
             let new_path: &Path = Path::new(&new_file);
 
@@ -227,25 +186,19 @@ fn retrieve(year: String, month: String, day: String, filename: String) -> Optio
                 let new_pixel: Rgba<u8> = gain([r,g,b], alpha);
                 new_colorized_image.put_pixel(x, y, new_pixel)
             }
-
             new_colorized_image.save(new_path).unwrap();
 
-
-            new_path
+            let pathbuf: PathBuf = new_path.to_owned();
+            pathbuf
         }
         None => {
             panic!("Error");
         }
-    };*/
+    };
 
-    let new_path = image(filename, path, url);
-
-    //let new_path = Path::new("2008/10/01/radar_0810010000.png");
-
-    println!("Elapsed: {:?}", start.elapsed());
-    let f = File::open(&new_path).map(|f| content::Content(ContentType::PNG, f)).ok();
+    let f = File::open(&path_buf).map(|f| content::Content(ContentType::PNG, f)).ok();
     let duration = start.elapsed();
-    println!("END Elapsed: {:?}", start.elapsed());
+    println!("Elapsed: {:?}", start.elapsed());
     f
 }
 
