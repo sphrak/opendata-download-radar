@@ -22,7 +22,7 @@ you use the `.tiff` format. This is problematic on platforms
 such as Android because native image decoders does not support
 the tiff-format.
 
-This drop-in-replacement allows you to have the same behavior as SMHI`s api,
+This drop-in-replacement allows you to have the same behavior as SMHI's api,
 but the only difference is that it will serve convert the tiff image into
 `.png`-format and serve you it back.
 
@@ -39,7 +39,6 @@ The radar images are stored in `/data/{year}/{month}/{date}/{filename}.png`.
 ```sh
 cargo run --release
 ```
-
 
 ## Build
 
