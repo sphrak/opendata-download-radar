@@ -152,6 +152,41 @@ fn gain(rgb: [u8; 3], alpha: u8) -> Rgba<u8> {
     }
 }
 
+fn image(filename: String, path: String, url: String) -> &'static Path {
+
+    let mut response: Response = reqwest::get(&url).unwrap();
+    let filename_path: &Path = Path::new(&filename);
+
+    match filename_path.file_stem() {
+        Some(stem) => {
+            let new_file: String = format!("{}/{}.png", &path, stem.to_str().unwrap());
+            let new_path: &Path = Path::new(&new_file);
+
+            let mut buffer: Vec<u8> = Vec::new();
+
+            response.read_to_end(&mut buffer).unwrap();
+
+            let img: DynamicImage = load_from_memory_with_format(&buffer, image::ImageFormat::TIFF).unwrap();
+            let (width, height) = img.dimensions();
+
+            let mut new_colorized_image = ImageBuffer::new(width, height);
+
+            for (x, y, pixel) in img.pixels() {
+                let [r, g, b, alpha] = pixel.data;
+                let new_pixel: Rgba<u8> = gain([r,g,b], alpha);
+                new_colorized_image.put_pixel(x, y, new_pixel)
+            }
+
+            new_colorized_image.save(new_path).unwrap();
+
+
+            new_path
+        }
+        None => {
+            panic!("Error");
+        }
+    }
+}
 
 #[get("/version/latest/area/sweden/product/comp/<year>/<month>/<day>/<filename>")]
 fn retrieve(year: String, month: String, day: String, filename: String) -> Option<content::Content<File>> {
@@ -171,63 +206,41 @@ fn retrieve(year: String, month: String, day: String, filename: String) -> Optio
 
     let full_path: &Path = Path::new(&file);
 
-    let mut response: Response = reqwest::get(&url).unwrap();
-    println!("After network request: {:?}", start.elapsed());
-    let filename_path: &Path = Path::new(&filename);
 
-    // TODO let blah = match etc and reeturn the file boi
-    match filename_path.file_stem() {
+
+    /*let new: &Path = match filename_path.file_stem() {
         Some(stem) => {
-            let new_file: String = format!("{}/{}.png", path, stem.to_str().unwrap());
+            let new_file: String = format!("{}/{}.png", &path, stem.to_str().unwrap());
             let new_path: &Path = Path::new(&new_file);
 
             let mut buffer: Vec<u8> = Vec::new();
 
             response.read_to_end(&mut buffer).unwrap();
 
-            let mut img: DynamicImage = load_from_memory_with_format(&buffer, image::ImageFormat::TIFF).unwrap();
-
-            // get dimensions
+            let img: DynamicImage = load_from_memory_with_format(&buffer, image::ImageFormat::TIFF).unwrap();
             let (width, height) = img.dimensions();
-
-            // save the buffer as .png file
-            println!("Saving: {:?}", new_path);
-
-
-            println!("Height: {}", height);
-            println!("Weight: {}", width);
 
             let mut new_colorized_image = ImageBuffer::new(width, height);
 
             for (x, y, pixel) in img.pixels() {
-                //println!("R: {:?}, G: {:?}, B: {:?}, A: {:?}", pixel.data[0], pixel.data[1], pixel.data[2], pixel.data[3]);
-                //pixel.data
-                let [r, g, b, a] = pixel.data;
-
-
-
-                // get new translate(rgb, channel) color
-                // get back [r,g,b,a]
-                // TODO just summarize all rgb values.. match against
-                // our new color scheme. maybe a color ini file?
-
-                //let new_pixel = image::Rgba([r, g, b, a]);
-                let new_pixel = gain([r,g,b], a);
-
+                let [r, g, b, alpha] = pixel.data;
+                let new_pixel: Rgba<u8> = gain([r,g,b], alpha);
                 new_colorized_image.put_pixel(x, y, new_pixel)
             }
 
             new_colorized_image.save(new_path).unwrap();
 
-            // THIS IS HOW WE SHOULD SAVE BUT NE
-            //img.save(new_path).unwrap();
+
+            new_path
         }
         None => {
             panic!("Error");
         }
-    }
+    };*/
 
-    let new_path = Path::new("2008/10/01/radar_0810010000.png");
+    let new_path = image(filename, path, url);
+
+    //let new_path = Path::new("2008/10/01/radar_0810010000.png");
 
     println!("Elapsed: {:?}", start.elapsed());
     let f = File::open(&new_path).map(|f| content::Content(ContentType::PNG, f)).ok();
