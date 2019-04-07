@@ -45,7 +45,7 @@ fn get_rand_col(alpha: u8) -> Rgba<u8> {
 
 fn gain(rgb: [u8; 3], alpha: u8) -> Rgba<u8> {
     match rgb {
-        [0, 0, 0] => Rgba([0,0,0, 255/4]),
+        [0, 0, 0] => Rgba([0,0,0, 0]),
         [54, 54, 54] => get_rand_col(alpha),
         [55, 55, 55] => get_rand_col(alpha),
         [56, 56, 56] => get_rand_col(alpha),
@@ -146,7 +146,7 @@ fn gain(rgb: [u8; 3], alpha: u8) -> Rgba<u8> {
         [166, 255, 255] => get_rand_col(alpha),
         [179, 255, 255] => get_rand_col(alpha),
         [192, 255, 255] => get_rand_col(alpha),
-        [255, 255, 255] => Rgba([255, 255, 255, 0]),
+        [255, 255, 255] => Rgba([255, 255, 255, 16]),
         _ => get_rand_col(alpha),
     }
 }

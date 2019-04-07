@@ -59,6 +59,8 @@ $ docker run -it --rm -v data:/data sphrak/opendata-download-radar:latest
 * https://docs.rs/image/0.21.0/image/
 * https://docs.rs/reqwest/0.9.13/reqwest/
 * https://api.rocket.rs/v0.4/rocket/
+* https://github.com/shssoichiro/oxipng
+* https://github.com/BurntSushi/rust-csv
 
 ## License
 
