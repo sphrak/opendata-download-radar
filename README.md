@@ -41,6 +41,11 @@ cargo run --release
 ```
 
 ## Build
+Build is run in `rust:latest` image then binary is copied
+to runtime image `opendata-download-radar` image.
+```sh
+$ docker build -t opendata-download-radar:latest .
+```
 
 ### Configuration
 Optional `colors.ini` can be supplied to serve colored images.
@@ -49,7 +54,7 @@ in a grayscale format.
 
 ### Run in docker
 You can run the instance via docker:
-```
+```sh
 $ docker run -it --rm -v data:/data sphrak/opendata-download-radar:latest
 ```
 
