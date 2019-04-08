@@ -159,7 +159,6 @@ fn retrieve(year: String, month: String, day: String, filename: String) -> Optio
     let file: String = format!("{year}/{month}/{day}/{filename}", year = year, month = month, day = day, filename = filename);
     let path: String = format!("{year}/{month}/{day}", year = year, month = month, day = day);
     let url: String = format!("{}/{}/{}.{}", API_URL, SUB_DIRECTORY, file, TIFF_EXTENSION);
-    println!("INTERNAL GET: {}", url);
 
     mkdir(&path);
 
