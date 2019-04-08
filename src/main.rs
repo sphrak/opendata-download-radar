@@ -163,7 +163,6 @@ fn retrieve(year: String, month: String, day: String, filename: String) -> Optio
 
     mkdir(&path);
 
-    let mut response: Response = reqwest::get(&url).unwrap();
     let filename_path: &Path = Path::new(&filename);
 
     let path_buf: PathBuf = match filename_path.file_stem() {
@@ -172,24 +171,33 @@ fn retrieve(year: String, month: String, day: String, filename: String) -> Optio
             let new_file: String = format!("{}/{}.png", &path, stem.to_str().unwrap());
             let new_path: &Path = Path::new(&new_file);
 
-            let mut buffer: Vec<u8> = Vec::new();
+            if new_path.exists() {
+                println!("File exists: {:?}", new_path);
+                let buf: PathBuf = new_path.to_owned();
+                buf
+            } else {
+                println!("File not found!");
+                let mut response: Response = reqwest::get(&url).unwrap();
 
-            response.read_to_end(&mut buffer).unwrap();
+                let mut buffer: Vec<u8> = Vec::new();
 
-            let img: DynamicImage = load_from_memory_with_format(&buffer, image::ImageFormat::TIFF).unwrap();
-            let (width, height) = img.dimensions();
+                response.read_to_end(&mut buffer).unwrap();
 
-            let mut new_colorized_image = ImageBuffer::new(width, height);
+                let img: DynamicImage = load_from_memory_with_format(&buffer, image::ImageFormat::TIFF).unwrap();
+                let (width, height) = img.dimensions();
 
-            for (x, y, pixel) in img.pixels() {
-                let [r, g, b, alpha] = pixel.data;
-                let new_pixel: Rgba<u8> = gain([r,g,b], alpha);
-                new_colorized_image.put_pixel(x, y, new_pixel)
+                let mut new_colorized_image = ImageBuffer::new(width, height);
+
+                for (x, y, pixel) in img.pixels() {
+                    let [r, g, b, alpha] = pixel.data;
+                    let new_pixel: Rgba<u8> = gain([r, g, b], alpha);
+                    new_colorized_image.put_pixel(x, y, new_pixel)
+                }
+                new_colorized_image.save(new_path).unwrap();
+
+                let pathbuf: PathBuf = new_path.to_owned();
+                pathbuf
             }
-            new_colorized_image.save(new_path).unwrap();
-
-            let pathbuf: PathBuf = new_path.to_owned();
-            pathbuf
         }
         None => {
             panic!("Error");
