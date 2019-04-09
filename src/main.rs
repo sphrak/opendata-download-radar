@@ -5,8 +5,8 @@ extern crate image;
 #[macro_use]
 extern crate rocket;
 
-use std::fs::create_dir_all;
 use std::fs::File;
+use std::fs::create_dir_all;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
@@ -16,11 +16,13 @@ use rand::Rng;
 use image::DynamicImage;
 use image::GenericImageView;
 use image::ImageBuffer;
-use image::load_from_memory_with_format;
 use image::RGB;
 use image::Rgba;
+use image::load_from_memory_with_format;
 use image::save_buffer;
+
 use reqwest::Response;
+
 use rocket::{get, routes};
 use rocket::http::ContentType;
 use rocket::response::content;
