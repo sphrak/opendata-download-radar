@@ -1,20 +1,16 @@
 # opendata-download-radar
-A drop-in API replacement if you want to use grayscale radar imagery as
-`.png` rather than the `.tif`-format.
+
+**I am not working on this anymore. Maybe in the future.**
+
+Status: proof-of-concept, not even alpha
+
+A drop-in proxy service for colorizing grayscale radar imagery from SMHI Öppna API Radar in `.tif` and converts it to `.png`.
 
 You can run it in two modes, either serve the imagery in gray-scale
 but as `.png` or you can supply a colorscheme that colorizes the
 imagery for you, still serving you it as `.png`.
 
-> Downloads and colorizes and serves a 887x471 pixel image in < 100 ms.
-
-## Why is this useful?
-If you want to utilize the grayscale radar imagery on certain
-platforms such as Android you stuck with the `.tif`-format.
-This format is not officially supported by the image decoders
-built into the Android framework.
-
-Supports latest radar images served as `.png`.
+Downloads and colorizes and serves a 887x471 px image in < 100 ms on my laptop.
 
 ### What is this?
 SMHI Open Data API does not support serving unbranded imagery unless
@@ -50,7 +46,7 @@ $ docker build -t opendata-download-radar:latest .
 ### Configuration
 Optional `colors.ini` can be supplied to serve colored images.
 Otherwise the grayscale image will simply be returned to you
-in a grayscale format.
+in png-format.
 
 ### Run in docker
 You can run the instance via docker:
